@@ -1,0 +1,152 @@
+Here is a basic structure for the game you described in a single HTML file. This is a starting point and can be expanded with more details and enhancements:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Space Adventure</title>
+<style>
+  body { margin: 0; overflow: hidden; background: black; }
+  canvas { display: block; background: url('starfield.png') repeat; }
+  .score { position: absolute; top: 10px; left: 10px; color: white; font-size: 24px; }
+  .lives { position: absolute; top: 10px; right: 10px; color: white; font-size: 24px; }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+<div class="score">Score: <span id="score">0</span></div>
+<div class="lives">Lives: <span id="lives">3</span></div>
+<script>
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  // Variables
+  let score = 0;
+  let lives = 3;
+  let asteroids = [];
+  let lasers = [];
+
+  // Spaceship
+  const spaceship = {
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    width: 50,
+    height: 50,
+    dx: 0,
+    dy: 0,
+    speed: 5
+  };
+
+  function drawSpaceship() {
+    ctx.fillStyle = 'white';
+    ctx.fillRect(spaceship.x, spaceship.y, spaceship.width, spaceship.height);
+  }
+
+  // Controls
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'ArrowUp') spaceship.dy = -spaceship.speed;
+    if (e.code === 'ArrowDown') spaceship.dy = spaceship.speed;
+    if (e.code === 'ArrowLeft') spaceship.dx = -spaceship.speed;
+    if (e.code === 'ArrowRight') spaceship.dx = spaceship.speed;
+    if (e.code === 'Space') shootLaser();
+  });
+
+  document.addEventListener('keyup', (e) => {
+    if (e.code === 'ArrowUp' || e.code === 'ArrowDown') spaceship.dy = 0;
+    if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') spaceship.dx = 0;
+  });
+
+  function shootLaser() {
+    lasers.push({ x: spaceship.x + spaceship.width / 2, y: spaceship.y, width: 5, height: 10, dy: -7 });
+  }
+
+  function drawLasers() {
+    ctx.fillStyle = 'red';
+    lasers.forEach((laser, index) => {
+      laser.y += laser.dy;
+      ctx.fillRect(laser.x, laser.y, laser.width, laser.height);
+      if (laser.y < 0) lasers.splice(index, 1);
+    });
+  }
+
+  // Asteroids
+  function generateAsteroids() {
+    if (Math.random() < 0.02) {
+      const size = Math.random() * 50 + 20;
+      asteroids.push({ x: Math.random() * canvas.width, y: -size, width: size, height: size, dy: Math.random() * 3 + 1 });
+    }
+  }
+
+  function drawAsteroids() {
+    ctx.fillStyle = 'gray';
+    asteroids.forEach((asteroid, index) => {
+      asteroid.y += asteroid.dy;
+      ctx.fillRect(asteroid.x, asteroid.y, asteroid.width, asteroid.height);
+      if (asteroid.y > canvas.height) asteroids.splice(index, 1);
+    });
+  }
+
+  function checkCollisions() {
+    asteroids.forEach((asteroid, aIndex) => {
+      if (rectCollision(spaceship, asteroid)) {
+        lives--;
+        asteroids.splice(aIndex, 1);
+        if (lives <= 0) gameOver();
+      }
+      lasers.forEach((laser, lIndex) => {
+        if (rectCollision(laser, asteroid)) {
+          score += Math.floor(asteroid.width / 10);
+          asteroids.splice(aIndex, 1);
+          lasers.splice(lIndex, 1);
+        }
+      });
+    });
+  }
+
+  function rectCollision(rect1, rect2) {
+    return rect1.x < rect2.x + rect2.width &&
+           rect1.x + rect1.width > rect2.x &&
+           rect1.y < rect2.y + rect2.height &&
+           rect1.y + rect1.height > rect2.y;
+  }
+
+  function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    spaceship.x += spaceship.dx;
+    spaceship.y += spaceship.dy;
+    drawSpaceship();
+    drawLasers();
+    generateAsteroids();
+    drawAsteroids();
+    checkCollisions();
+
+    document.getElementById('score').innerText = score;
+    document.getElementById('lives').innerText = lives;
+
+    requestAnimationFrame(update);
+  }
+
+  function gameOver() {
+    alert('Game Over! Your score: ' + score);
+    document.location.reload();
+  }
+
+  update();
+</script>
+</body>
+</html>
+```
+
+This provides a basic game framework:
+- **Controls for the spaceship** 
+- **Shooting lasers**
+- **Generating and drawing asteroids**
+- **Checking for collisions**
+- **Scoring and life display**
+- **Game Over screen**
+
+Feel free to expand and enhance this game further with the additional features you described![43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/Space-For-Inception/dost/tree/645c5ac619409e98677b891a758eabe2684d96e0/messages.py?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "1")[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/GLBRC/CRISpy-pop/tree/4455194cec7d71753aa62dad4c3dd8d508573366/public%2Fpacks%2Fjs%2Fgene_submission-5ec8474bb39acfaa43f2.js?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "2")
